@@ -71,6 +71,7 @@ Click the menu bar icon to adjust:
 
 Settings are stored at `~/.finder_quick_actions.json`.
 
+Build with Gemini 3.5 Flash.
 ---
 
 ## License
