@@ -56,12 +56,13 @@ struct SettingsView: View {
                     HStack {
                         Text("Extension:")
                             .frame(width: 100, alignment: .leading)
-                        Picker("", selection: $fileExtension) {
-                            ForEach(extensionOptions, id: \.self) { opt in
-                                Text(opt == "custom" ? "Custom..." : ".\(opt)").tag(opt)
-                            }
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
+                        FittedSegmentedPicker(
+                            options: extensionOptions,
+                            labels: extensionOptions.map { $0 == "custom" ? "Custom..." : ".\($0)" },
+                            selection: $fileExtension
+                        )
+                        .fixedSize()
+                        Spacer()
                     }
                     
                     if fileExtension == "custom" {
@@ -91,6 +92,9 @@ struct SettingsView: View {
                             }
                         }
                         .pickerStyle(PopUpButtonPickerStyle())
+                        .labelsHidden()
+                        .fixedSize()
+                        Spacer()
                     }
                 }
                 
@@ -125,6 +129,7 @@ struct SettingsView: View {
 
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             
             Divider()
             
@@ -209,5 +214,37 @@ struct SettingsView: View {
     private func openSystemExtensions() {
         let url = URL(string: "x-apple.systempreferences:com.apple.ExtensionsPreferences")!
         NSWorkspace.shared.open(url)
+    }
+}
+
+// SwiftUI's segmented picker gives every segment the same width on macOS 27,
+// which overflows the window; NSSegmentedControl sizes segments to their labels.
+struct FittedSegmentedPicker: NSViewRepresentable {
+    let options: [String]
+    let labels: [String]
+    @Binding var selection: String
+
+    func makeNSView(context: Context) -> NSSegmentedControl {
+        let control = NSSegmentedControl(labels: labels, trackingMode: .selectOne,
+                                         target: context.coordinator,
+                                         action: #selector(Coordinator.changed(_:)))
+        control.segmentDistribution = .fit
+        return control
+    }
+
+    func updateNSView(_ control: NSSegmentedControl, context: Context) {
+        context.coordinator.parent = self
+        control.selectedSegment = options.firstIndex(of: selection) ?? -1
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    class Coordinator: NSObject {
+        var parent: FittedSegmentedPicker
+        init(_ parent: FittedSegmentedPicker) { self.parent = parent }
+
+        @objc func changed(_ sender: NSSegmentedControl) {
+            parent.selection = parent.options[sender.selectedSegment]
+        }
     }
 }
