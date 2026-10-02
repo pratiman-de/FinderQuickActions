@@ -21,7 +21,8 @@ I built this after switching from Windows because I missed basic context menu op
 
 ## Requirements
 
-- macOS 14.0 (Sonoma) for pre-compiled app or newer (Apple Silicon)
+- macOS 26 (Tahoe) or macOS 27, Apple Silicon
+- Version 1.1 or later is required on macOS 27 (1.0 has a cut-off settings window there)
 - Xcode Command Line Tools (`xcode-select --install`) for compiling from source
 
 ---
@@ -71,7 +72,6 @@ Click the menu bar icon to adjust:
 
 Settings are stored at `~/.finder_quick_actions.json`.
 
-Build with Gemini 3.5 Flash.
 ---
 
 ## License
